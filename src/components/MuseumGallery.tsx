@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "@phosphor-icons/react";
 import Image from "next/image";
 import { useEffect } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -44,10 +45,11 @@ function CloseButton({ onClose }: { onClose: () => void }) {
   return (
     <button
       type="button"
+      aria-label="Close"
       onClick={(e) => { e.stopPropagation(); onClose(); }}
-      className="absolute left-8 top-20 z-10 text-[12px] uppercase tracking-[0.2em] text-ink/80 hover:text-ink"
+      className="absolute left-8 top-20 z-10 text-ink/80 hover:text-ink"
     >
-      Close
+      <X size={22} weight="light" />
     </button>
   );
 }

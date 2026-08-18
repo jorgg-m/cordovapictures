@@ -21,7 +21,7 @@ export default function ContactPage() {
   return (
     <section className="min-h-[100dvh] bg-paper px-4 pb-20 pt-24 md:px-8">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-normal text-ink">About me</h1>
+        <h1 className="text-center text-2xl font-normal text-ink">About me</h1>
         <div className="relative mt-6 aspect-[16/9] overflow-hidden">
           <Image
             src="/images/about.jpg"
