@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cordova Pictures
+
+Next.js photography portfolio for Eduardo Cordova.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Image optimization (local Python tool)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`tools/optimize_images.py` prepares web images from raw photos. It is local-only and lives outside the Netlify publish output.
 
-## Learn More
+### What it does
 
-To learn more about Next.js, take a look at the following resources:
+1. Reads nested files from `originals/` (`.jpg`, `.jpeg`, `.png`, `.tif`, `.tiff`)
+2. Applies EXIF orientation and converts color to sRGB
+3. Writes AVIF + WebP variants at `480`, `800`, `1200`, and `1920` widths
+4. Saves files under `public/images/optimized/`, preserving the folder structure
+5. Writes `public/images/optimized/manifest.json` with original size and generated widths
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Example output:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+public/images/optimized/v1/Portraits/Raquel/Raquel Web-1-800w.avif
+public/images/optimized/v1/Portraits/Raquel/Raquel Web-1-800w.webp
+```
 
-## Deploy on Vercel
+### Setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r tools/requirements.txt
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`.venv/`, `originals/`, and `__pycache__/` are gitignored.
+
+### Usage
+
+1. Put source photos in `originals/` (nested folders are fine)
+2. Run:
+
+```bash
+source .venv/bin/activate
+python tools/optimize_images.py
+```
+
+Or without activating the venv:
+
+```bash
+.venv/bin/python tools/optimize_images.py
+```
+
+### Notes
+
+- Photos smaller than a target width are not upscaled past their original size
+- Commits that only touch `tools/` or `originals/` do not trigger a Netlify deploy
+- Optimized files under `/images/optimized/*` are cached as immutable on Netlify
