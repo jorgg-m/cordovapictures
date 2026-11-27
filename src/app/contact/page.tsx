@@ -1,9 +1,22 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Image from "next/image";
 import { ContactDetails } from "@/components/ContactDetails";
 import { ContactForm } from "@/components/ContactForm";
+import { ResponsivePicture } from "@/components/ResponsivePicture";
+import type { OptimizedImage } from "@/data/images";
+import manifest from "../../../public/images/optimized/manifest.json";
+
+const KEY = "v1/Vogue/Vogue Danna";
+const meta = (manifest as Record<string, { width: number; height: number; widths: number[] }>)[KEY];
+
+const aboutImage: OptimizedImage = {
+  key: KEY,
+  alt: "Eduardo Cordova, Vogue Danna photograph",
+  width: meta.width,
+  height: meta.height,
+  widths: meta.widths,
+};
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
@@ -23,13 +36,12 @@ export default function ContactPage() {
       <div className="mx-auto max-w-4xl">
         <h1 className="text-center text-2xl font-normal text-ink">About me</h1>
         <div className="relative mt-6 aspect-[16/9] overflow-hidden">
-          <Image
-            src="/images/about.jpg"
-            alt="Eduardo Cordova in the studio"
-            fill
-            priority
-            className="object-cover"
-            sizes="896px"
+          <ResponsivePicture
+            image={aboutImage}
+            sizes="(max-width: 896px) 100vw, 896px"
+            className="h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         </div>
         <p className="mx-auto mt-10 max-w-[65ch] text-center text-base leading-relaxed text-ink/80">

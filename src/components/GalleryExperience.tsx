@@ -3,9 +3,10 @@
 import { useEffect } from "react";
 import { CorridorWall } from "@/components/CorridorWall";
 import { MuseumGallery } from "@/components/MuseumGallery";
+import type { OptimizedImage } from "@/data/images";
 import { useGalleryStore } from "@/stores/useGalleryStore";
 
-type Props = { images: string[]; title: string };
+type Props = { images: OptimizedImage[]; title: string };
 
 export function GalleryExperience({ images, title }: Props) {
   const mode = useGalleryStore((s) => s.mode);

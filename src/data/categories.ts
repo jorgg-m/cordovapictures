@@ -1,41 +1,53 @@
+import manifest from "../../public/images/optimized/manifest.json";
+import type { OptimizedImage } from "@/data/images";
+
+type Meta = { width: number; height: number; widths: number[] };
+
 export type Category = {
   slug: string;
   title: string;
-  cover: string;
-  images: string[];
+  cover: OptimizedImage;
+  images: OptimizedImage[];
 };
 
-const pool = [
-  "/images/portraits.jpg",
-  "/images/people.jpg",
-  "/images/personal.jpg",
-  "/images/studio.jpg",
-  "/images/passing.jpg",
-  "/images/popup.jpg",
-  "/images/cover.jpg",
-  "/images/holding.jpg",
-  "/images/pride.jpg",
-];
+const DIRS = [
+  { slug: "portraits", title: "Portraits", dir: "Portraits" },
+  {
+    slug: "personal-arts-and-crafts",
+    title: "Personal Arts and crafts",
+    dir: "Personal Arts and crafts",
+  },
+  { slug: "vogue", title: "Vogue", dir: "Vogue" },
+  {
+    slug: "weddings-and-events",
+    title: "Weddings & Events",
+    dir: "Weddings & Events",
+  },
+] as const;
 
-function gallery(cover: string) {
-  return [cover, ...pool.filter((p) => p !== cover)];
+function toImage(key: string, meta: Meta): OptimizedImage {
+  return {
+    key,
+    alt: key.split("/").at(-1) ?? key,
+    width: meta.width,
+    height: meta.height,
+    widths: meta.widths,
+  };
 }
 
-function cat(slug: string, title: string, cover: string): Category {
-  return { slug, title, cover, images: gallery(cover) };
+function imagesFor(dir: string): OptimizedImage[] {
+  const prefix = `v1/${dir}/`;
+  const data = manifest as Record<string, Meta>;
+  return Object.entries(data)
+    .filter(([key]) => key.startsWith(prefix))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, meta]) => toImage(key, meta));
 }
 
-export const categories: Category[] = [
-  cat("portraits", "Portraits", "/images/portraits.jpg"),
-  cat("people-you-may-know", "People You May Know", "/images/people.jpg"),
-  cat("personal-projects", "Personal Projects", "/images/personal.jpg"),
-  cat("studio-visits", "Studio Visits", "/images/studio.jpg"),
-  cat("passing-through", "Passing Through", "/images/passing.jpg"),
-  cat("pop-up-studios", "Pop-Up Studios", "/images/popup.jpg"),
-  cat("cover-stories", "Cover Stories", "/images/cover.jpg"),
-  cat("holding-space", "Holding Space", "/images/holding.jpg"),
-  cat("pride-projects", "Pride Projects", "/images/pride.jpg"),
-];
+export const categories: Category[] = DIRS.map((d) => {
+  const images = imagesFor(d.dir);
+  return { slug: d.slug, title: d.title, cover: images[0], images };
+});
 
 export function getCategory(slug: string) {
   return categories.find((c) => c.slug === slug);

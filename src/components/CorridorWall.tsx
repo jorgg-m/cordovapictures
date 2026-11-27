@@ -1,15 +1,16 @@
 "use client";
 
-import Image from "next/image";
 import { RefObject, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "motion/react";
+import { ResponsivePicture } from "@/components/ResponsivePicture";
+import type { OptimizedImage } from "@/data/images";
 import { useGalleryStore } from "@/stores/useGalleryStore";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
-type Props = { images: string[]; title: string };
+type Props = { images: OptimizedImage[]; title: string };
 type El = RefObject<HTMLDivElement | null>;
 
 export function CorridorWall({ images, title }: Props) {
@@ -23,8 +24,8 @@ export function CorridorWall({ images, title }: Props) {
         ref={track}
         className={`flex h-[100dvh] items-center px-10 ${reduce ? "overflow-x-auto" : ""}`}
       >
-        {images.map((src, i) => (
-          <WallFrame key={`${src}-${i}`} src={src} title={title} index={i} />
+        {images.map((image, i) => (
+          <WallFrame key={image.key} image={image} title={title} index={i} />
         ))}
       </div>
     </section>
@@ -65,14 +66,20 @@ function wallTrigger(trigger: HTMLDivElement | null, distance: number) {
   };
 }
 
-function WallFrame(p: { src: string; title: string; index: number }) {
+function WallFrame(p: { image: OptimizedImage; title: string; index: number }) {
   return (
     <button
       type="button"
       data-print={p.index}
-      className="relative mx-6 h-[62vh] w-[min(70vw,720px)] shrink-0"
+      className="relative mx-6 flex h-[62vh] w-[min(70vw,720px)] shrink-0 items-center justify-center"
     >
-      <Image src={p.src} alt={`${p.title} ${p.index + 1}`} fill className="object-contain" sizes="70vw" />
+      <ResponsivePicture
+        image={{ ...p.image, alt: `${p.title} ${p.index + 1}` }}
+        sizes="(max-width: 640px) 90vw, 70vw"
+        className="max-h-[62vh] max-w-full object-contain"
+        loading="lazy"
+        decoding="async"
+      />
     </button>
   );
 }
